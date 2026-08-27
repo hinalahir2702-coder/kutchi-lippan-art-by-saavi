@@ -39,3 +39,16 @@ body{overflow-x:hidden}
  .process-video{min-height:430px}
  .modal>img{height:auto;max-height:46vh}
 }
+
+/* Keep the complete hero photograph unobstructed at every screen size. */
+.hero>img{grid-column:1;grid-row:1}
+.hero-shade{display:none}
+.hero-copy{grid-column:1;grid-row:2;max-width:none;padding:clamp(52px,7vw,100px) 7vw;background:var(--black)}
+.hero-copy>p:not(.eyebrow){max-width:620px}
+.sun-seal{top:3%;right:3%}
+.ai-note{position:static;display:block;width:max-content;margin-top:22px}
+
+@media(max-width:560px){
+ .hero-copy{padding:42px 20px 56px}
+ .sun-seal{top:2%;right:4%}
+}
