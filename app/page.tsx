@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 type Product={id:number;name:string;cat:string;price:number;image:string;note?:string};
 const products:Product[]=[
@@ -43,13 +43,21 @@ const cats=['All','Mandalas','Wall Art','Useful Art','Mirrors','Folk Tiles','Sac
 
 export default function Home(){
  const [cat,setCat]=useState('All'); const [cart,setCart]=useState<Record<number,number>>({}); const [cartOpen,setCartOpen]=useState(false); const [menu,setMenu]=useState(false); const [selected,setSelected]=useState<Product|null>(null);
+ const heroVideo=useRef<HTMLVideoElement|null>(null); const [playing,setPlaying]=useState(true); const [muted,setMuted]=useState(true);
  const shown=cat==='All'?products:products.filter(p=>p.cat===cat); const count=Object.values(cart).reduce((a,b)=>a+b,0); const total=useMemo(()=>products.reduce((s,p)=>s+(cart[p.id]||0)*p.price,0),[cart]);
  const add=(p:Product)=>{setCart(c=>({...c,[p.id]:(c[p.id]||0)+1}));setCartOpen(true)}; const qty=(id:number,n:number)=>setCart(c=>{const next={...c};if(n<=0)delete next[id];else next[id]=n;return next});
+ const togglePlayback=()=>{const video=heroVideo.current;if(!video)return;if(video.paused){void video.play();}else video.pause()};
+ const toggleSound=()=>{const video=heroVideo.current;if(!video)return;video.muted=!video.muted;setMuted(video.muted)};
  return <main>
   <div className="grain"/><div className="announcement">ખમ્મા ઘણી · KHAMMA GHANI <span>✦</span> Handcrafted in Kutch · Shipping to the U.S.</div>
-  <header className="nav"><a className="brand" href="#top"><i>✦</i><span>KUTCHI LIPPAN ART<em>by Saavi</em></span></a><button className="menu" onClick={()=>setMenu(!menu)}>{menu?'Close':'Menu'}</button><nav className={menu?'open':''}><a href="#shop">Collection</a><a href="#story">Saavi&apos;s Story</a><a href="#making">The Making</a></nav><button className="bag" onClick={()=>setCartOpen(true)}>Bag <b>{count}</b></button></header>
-  <section className="hero-photo" id="top"><img src="kutch-women-artisans-ai.png" alt="Artistic representation of Kutchi women creating Lippan art together"/><div className="sun-seal">કચ્છ<br/><small>KUTCH</small></div></section>
-  <section className="hero"><div className="hero-copy"><p className="eyebrow">A love letter from the salt desert</p><h1>Made of <i>mitti.</i><br/>Lit by <i>mirrors.</i></h1><p>Objects shaped by Saavi&apos;s hands, carrying the old songs, bright courtyards, and generous spirit of Kutch into your home.</p><a href="#shop">Enter the collection <span>↓</span></a><div className="ai-note">ARTISTIC REPRESENTATION · CREATED WITH AI</div></div></section>
+  <header className="nav nav-overlay"><a className="brand" href="#top"><i>✦</i><span>KUTCHI LIPPAN ART<em>by Saavi</em></span></a><button className="menu" onClick={()=>setMenu(!menu)}>{menu?'Close':'Menu'}</button><nav className={menu?'open':''}><a href="#shop">Collection</a><a href="#story">Saavi&apos;s Story</a><a href="#making">The Making</a></nav><button className="bag" onClick={()=>setCartOpen(true)}>Bag <b>{count}</b></button></header>
+  <section className="cinematic-hero" id="top" aria-label="The story of Kutchi Lippan Art by Saavi">
+   <video ref={heroVideo} src="video/saavi-heritage-hero.mp4" poster="video/saavi-heritage-poster.jpg" autoPlay muted loop playsInline preload="auto" onPlay={()=>setPlaying(true)} onPause={()=>setPlaying(false)}/>
+   <div className="cinematic-shade"/>
+   <div className="cinematic-copy"><p>A living tradition</p><h1>Kutchi Lippan Art <i>by Saavi</i></h1><div><a href="#shop">Explore the collection</a><a href="#story">Meet Saavi</a></div></div>
+   <div className="cinematic-controls"><button onClick={togglePlayback} aria-label={playing?'Pause opening film':'Play opening film'}>{playing?'Pause':'Play'}</button><button onClick={toggleSound} aria-label={muted?'Turn film sound on':'Mute film'}>{muted?'Sound on':'Mute'}</button></div>
+  </section>
+  <section className="hero"><div className="hero-copy"><p className="eyebrow">A love letter from the salt desert</p><h2 className="intro-title">Made of <i>mitti.</i><br/>Lit by <i>mirrors.</i></h2><p>Objects shaped by Saavi&apos;s hands, carrying the old songs, bright courtyards, and generous spirit of Kutch into your home.</p><a href="#shop">Enter the collection <span>↓</span></a></div></section>
   <section className="ticker"><div>CLAY remembers · MIRRORS gather light · HANDS carry stories · CLAY remembers · MIRRORS gather light · HANDS carry stories ·</div></section>
   <section className="story" id="story"><div className="story-left"><p className="num">01 / SAAVI&apos;S STORY</p><h2>“I make each line<br/>the way I <i>feel it.</i>”</h2><p className="drop">In Kutch, art has never lived only in galleries. It lives on walls, in courtyards, around doorways—and in the hands of women who gather, talk, laugh, and make.</p><p>Saavi brings that intimate rhythm to every piece. Clay is rolled by hand. Mirrors are set one by one. The tiny differences are not flaws; they are proof that a person was here.</p><a href="#making">Watch Saavi at work →</a></div><div className="story-collage"><img className="large" src="products/key-holder-red.jpg" alt="Saavi's handcrafted key holder"/><img className="small" src="archive/mini-mandalas.jpg" alt="Colorful collection of small mandalas"/><span>ઘર · HOME</span></div></section>
   <section className="process" id="making"><div className="process-video"><video src="video/making.mp4" controls muted playsInline poster="products/ganesh.jpg"/><b>SAAVI AT WORK</b></div><div><p className="num">02 / FROM HER HANDS</p><h2>Mud. Mirror.<br/><i>Memory.</i></h2><ol><li><span>01</span><p><b>Draw the rhythm</b>Each motif begins without a template—guided by memory and instinct.</p></li><li><span>02</span><p><b>Shape the earth</b>Clay is rolled and pressed into lines that rise from the surface.</p></li><li><span>03</span><p><b>Invite the light</b>Mirrors are placed one by one, giving every piece its changing glow.</p></li></ol></div></section>
